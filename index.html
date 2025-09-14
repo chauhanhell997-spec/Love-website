@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Secret for You</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(-45deg, #ffdde1, #ee9ca7, #fad0c4, #fbc2eb);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #4b4b4b;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1, h2 {
+      font-family: 'Dancing Script', cursive;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .page {
+      display: none;
+      opacity: 0;
+      transition: opacity 1s ease, transform 1s ease;
+      transform: translateY(30px);
+    }
+    .page.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .btn {
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 15px rgba(255,118,150,0.4);
+      letter-spacing: 0.05em;
+    }
+    .btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 25px rgba(255,118,150,0.6);
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      animation: fadeInCard 1.5s ease;
+    }
+    @keyframes fadeInCard {
+      from {opacity: 0; transform: scale(0.95);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    .image-placeholder img {
+      transition: transform 0.6s ease;
+    }
+    .image-placeholder img:hover {
+      transform: scale(1.05) rotate(1deg);
+    }
+
+    /* Floating Hearts */
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      font-size: 20px;
+      color: rgba(255, 0, 102, 0.6);
+      animation: floatUp 8s linear infinite;
+      z-index: 0;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+    }
+
+    /* Wrong password modal */
+    #wrongModal {
+      transition: opacity 0.4s ease;
+    }
+    #wrongCard {
+      transform: scale(0.7);
+      opacity: 0;
+    }
+    #wrongCard.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+
+  <!-- Floating hearts (JS will generate) -->
+  <div id="hearts-container"></div>
+
+  <!-- Page 1: Login -->
+  <div id="page1" class="page active flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h1 class="text-5xl md:text-6xl text-pink-700 mb-6">A Secret for You</h1>
+      <p class="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
+        Before you can open this special message, you must unlock it. Only you hold the key to my heart, so please enter your name and the secret that started it all.
+      </p>
+      <form id="loveForm" class="flex flex-col items-center">
+        <input type="text" id="characterNameInput" placeholder="Your Name" class="w-full md:w-3/4 p-4 mb-4 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200">
+        <input type="password" id="secretInput" placeholder="Our Secret Password" class="w-full md:w-3/4 p-4 mb-6 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-200">
+        <button type="submit" class="btn">
+          Unlock My Heart
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Page 2: Beauty -->
+  <div id="page2" class="page flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h2 class="text-4xl md:text-5xl text-pink-700 mb-6" id="beautyTitle"></h2>
+      <div class="image-placeholder w-full h-80 rounded-xl mb-6 overflow-hidden">
+        <img src="a.jpg" alt="Her beauty" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
+        I see your beauty not just in your smile, but in the way your eyes sparkle when you're happy. It's in the grace of your movements and the kindness that emanates from your soul. You are a masterpiece, my love.
+      </p>
+      <button class="btn" onclick="nextPage(3)">Next</button>
+    </div>
+  </div>
+
+  <!-- Page 3: Qualities -->
+  <div id="page3" class="page flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h2 class="text-4xl md:text-5xl text-pink-700 mb-6" id="qualityTitle"></h2>
+      <div class="image-placeholder w-full h-80 rounded-xl mb-6 overflow-hidden">
+        <img src="c.jpg" alt="Her qualities" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
+        Your compassion knows no bounds. You have a heart that feels deeply and a mind that is sharp and brilliant. You inspire me with your strength and ground me with your humility. You are my rock and my guiding light.
+      </p>
+      <button class="btn" onclick="nextPage(4)">Next</button>
+    </div>
+  </div>
+
+  <!-- Page 4: Memories -->
+  <div id="page4" class="page flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h2 class="text-4xl md:text-5xl text-pink-700 mb-6" id="memoriesTitle"></h2>
+      <div class="image-placeholder w-full h-80 rounded-xl mb-6 overflow-hidden">
+        <img src="b.jpg" alt="Shared memories" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
+        I find myself reliving our memories often—that first shy smile, the day we laughed until our stomachs hurt, and the quiet moments where your hand found mine. These are the treasures of my life, etched in my heart forever.
+      </p>
+      <button class="btn" onclick="nextPage(5)">Next</button>
+    </div>
+  </div>
+
+  <!-- Page 5: Feelings -->
+  <div id="page5" class="page flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h2 class="text-4xl md:text-5xl text-pink-700 mb-6" id="feelingsTitle"></h2>
+      <div class="image-placeholder w-full h-80 rounded-xl mb-6 overflow-hidden">
+        <img src="d.jpg" alt="My feelings for her" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
+        Your love has changed me in ways I never thought possible. You are the warmth in my mornings and the comfort in my nights. Every part of me feels a profound connection to you, and I am forever grateful for your presence in my life.
+      </p>
+      <button class="btn" onclick="nextPage(6)">Next</button>
+    </div>
+  </div>
+
+  <!-- Page 6: Final -->
+  <div id="page6" class="page flex-col items-center justify-center text-center max-w-lg mx-auto relative z-10">
+    <div class="card p-8 md:p-12 w-full">
+      <h2 class="text-4xl md:text-5xl text-pink-700 mb-6" id="finalTitle"></h2>
+      <div class="image-placeholder w-full h-80 rounded-xl mb-6 overflow-hidden">
+        <img src="e.jpg" alt="Our future together" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
+        My love, as you've moved through these pages, I hope you've felt just a fraction of the love and admiration I hold for you. You are my home, my peace, and my truest happiness. Thank you for being you.
+      </p>
+      <p class="text-xl md:text-2xl text-pink-800 font-bold mt-8">
+        With all my love, always.
+      </p>
+    </div>
+  </div>
+
+  <!-- Wrong Password Modal -->
+  <div id="wrongModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div id="wrongCard" class="bg-white bg-opacity-30 backdrop-blur-xl rounded-3xl shadow-2xl p-8 text-center max-w-sm w-full transition-all duration-500">
+      <h2 class="text-4xl text-pink-700 font-bold mb-4 animate-bounce">❤</h2>
+      <h3 class="text-2xl text-pink-800 font-semibold mb-3">Oops, My Love!</h3>
+      <p class="text-lg text-gray-700 leading-relaxed">
+        That wasn’t our secret password... 🌸<br>
+        Only <span class="font-bold text-pink-600">you</span> hold the right key to my heart. 💖<br>
+        Try again, my darling.
+      </p>
+      <button onclick="closeWrongModal()" class="btn mt-6">Okay, I’ll Try Again</button>
+    </div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c5baf20a5.mp3?filename=romantic-piano-11090.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    let currentPage = 1;
+    const SECRET_PASSWORD = '172719';
+    let characterName = '';
+
+    document.getElementById('loveForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      characterName = document.getElementById('characterNameInput').value;
+      const secret = document.getElementById('secretInput').value;
+      if (characterName && secret.toLowerCase() === SECRET_PASSWORD.toLowerCase()) {
+        document.getElementById('beautyTitle').textContent = 'My Darling ' + characterName + ', Your Beauty...';
+        document.getElementById('qualityTitle').textContent = 'And Your Qualities...';
+        document.getElementById('memoriesTitle').textContent = 'Our Shared Memories...';
+        document.getElementById('feelingsTitle').textContent = 'How You Make Me Feel...';
+        document.getElementById('finalTitle').textContent = 'My Forever, ' + characterName;
+        nextPage(2);
+        document.getElementById('bgMusic').play().catch(()=>{});
+      } else {
+        showWrongModal();
+      }
+    });
+
+    function nextPage(pageNumber) {
+      document.getElementById('page' + currentPage).classList.remove('active');
+      currentPage = pageNumber;
+      document.getElementById('page' + currentPage).classList.add('active');
+    }
+
+    function showWrongModal() {
+      const modal = document.getElementById('wrongModal');
+      const card = document.getElementById('wrongCard');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        card.classList.add('show');
+      }, 50);
+    }
+
+    function closeWrongModal() {
+      const modal = document.getElementById('wrongModal');
+      const card = document.getElementById('wrongCard');
+      card.classList.remove('show');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 400);
+    }
+
+    // Floating hearts generator
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '❤';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+      heart.style.animationDuration = (5 + Math.random() * 5) + 's';
+      document.getElementById('hearts-container').appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 8000);
+    }
+    setInterval(createHeart, 800);
+  </script>
+</body>
+</html>
